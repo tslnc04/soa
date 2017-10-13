@@ -62,4 +62,22 @@ class Lexer():
         "forward moves the position forward and adds to the buffer times times"
         for _ in range(times):
             self.next_char()
+
+    def lex_main(self):
+        "lex_main is the main loop for the lexer"
+        while True:
+            next = self.peek()
+
+            if next == "R":
+                # TODO: Add lex_register
+                return self.lex_register
             
+            if self.follow("set"):
+                # TODO: Add lex_set
+                return self.lex_set
+            elif self.follow("out"):
+                # TODO: Add lex_out
+                return self.lex_out
+            elif self.follow("add"):
+                # TODO: Add lex_add
+                return self.lex_add
