@@ -82,3 +82,10 @@ class Parser():
         if self.peek().Typ == token.REGISTER:
             register2 = self.next_token()
             parent, _ = tree.add_subtree(set_tree, register2)
+        elif self.peek().Typ == token.INT:
+            int_tok = self.next_token
+            parent, _ = tree.add_subtree(set_tree, int_tok)
+        else:
+            print("UNEXPECTED TOKEN", self.peek())
+
+        return self.parse_main(parent)
