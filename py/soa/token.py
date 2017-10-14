@@ -14,7 +14,7 @@ ADD = 6
 
 INT = 7
 
-token_names = [
+TOKEN_NAMES = [
     "error",
     "eof",
     "eol",
