@@ -2,90 +2,155 @@
 parser.py is the module containing
 """
 
-import token
-import tree
+from soa import token
+from soa import tree
 
 class Parser():
     "Parser handles most functions related to parsing"
-    def __init__(self):
-        self.incoming = {}
-        self.tree = {}
-        self.buffer = []
+    def __init__(self, incoming, result_tree):
+        self.incoming = incoming
+        self.tree = result_tree
     
     def next_token(self):
         "next_token advances to the next token"
-        if (len(self.buffer) != 0):
-            tok = self.buffer[0]
-            self.buffer = self.buffer[1:]
-            return tok
-
-        tok = self.incoming
-        self.incoming = {}
+        tok = self.incoming[0]
+        self.incoming = self.incoming[1:]
 
         return tok
 
     def peek(self):
         "peek is like next, but without advancing the buffer"
-        if (len(self.buffer) != 0):
-            return self.buffer[0]
-
-        tok = self.incoming
-        self.incoming = {}
+        tok = self.incoming[0]
 
         return tok
 
     def assert_token(self, token_type):
         "assert_token asserts if a token follows a type"
-        tok = self.next()
+        tok = self.next_token()
         
         if tok is None:
             print("EXPEXTING", token_type, "GOT NOTHING")
         
-        if tok.Typ != token_type:
+        if tok["Typ"] != token_type:
             print("EXPECTING", token_type, "GOT", tok)
 
         return tok
 
     def parse_main(self, parent):
         "parse_main is the main function for parsing"
-        tok = self.peek()
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
 
-        if tok is None:
+            tok = self.peek()
+
+            if tok is None:
+                return None
+
+            if tok["Typ"] == token.SET:
+                return self.parse_set(parent)
+            elif tok["Typ"] == token.OUT:
+                return self.parse_out(parent)
+            elif tok["Typ"] == token.ADD:
+                return self.parse_add(parent)
+            elif tok["Typ"] == token.EOL:
+                return self.parse_eol(parent)
+            elif tok["Typ"] == token.EOF:
+                return None
+
             return None
-
-        if tok.Typ == SET:
-            return self.parse_set(parent)
-        elif tok.Typ == OUT:
-            return self.parse_out(parent)
-        elif tok.Typ == ADD:
-            return self.parse_add(parent)
-        elif tok.Typ == REGISTER:
-            return self.parse_register(parent)
-        elif tok.Typ == INT:
-            return self.parse_int(parent)
-        elif tok.Typ == EOL:
-            return self.parse_eol(parent)
-        elif tok.Typ == EOF:
-            return None
-
-        return None
+        return return_func
 
     def parse_set(self, parent):
         "parse_set adds the token onto the main tree"
-        set_tok = self.next_token()
-        set_tree = tree.create_tree_with_token(set_tok, parent)
-        tree.tree_append(parent, set_tree)
-        
-        register = self.assert_token(token.REGISTER)
-        parent, _ = tree.add_subtree(set_tree, register)
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
 
-        if self.peek().Typ == token.REGISTER:
-            register2 = self.next_token()
-            parent, _ = tree.add_subtree(set_tree, register2)
-        elif self.peek().Typ == token.INT:
-            int_tok = self.next_token
-            parent, _ = tree.add_subtree(set_tree, int_tok)
-        else:
-            print("UNEXPECTED TOKEN", self.peek())
+            set_tok = self.next_token()
+            set_tree = tree.create_tree_with_token(set_tok, parent)
+            tree.tree_append(parent, set_tree)
+            
+            register = self.assert_token(token.REGISTER)
+            parent, _ = tree.add_subtree(set_tree, register)
 
-        return self.parse_main(parent)
+            if self.peek()["Typ"] == token.REGISTER:
+                register2 = self.next_token()
+                parent, _ = tree.add_subtree(set_tree, register2)
+            elif self.peek()["Typ"] == token.INT:
+                int_tok = self.next_token()
+                parent, _ = tree.add_subtree(set_tree, int_tok)
+            else:
+                print("UNEXPECTED TOKEN", self.peek())
+
+            return self.parse_main(parent)
+        return return_func
+
+    def parse_out(self, parent):
+        "parse_out adds the out token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            out = self.next_token()
+            out_tree = tree.create_tree_with_token(out, parent)
+            # Who knows if this works, python has weird call by reference rules
+            tree.tree_append(parent, out_tree)
+
+            while self.peek()["Typ"] in [token.REGISTER, token.INT]:
+                tok = self.next_token()
+                parent, _ = tree.add_subtree(out_tree, tok)
+
+            return self.parse_main(parent)
+        return return_func
+
+    def parse_add(self, parent):
+        "parse_add adds the add token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            add_tok = self.next_token()
+            add_tree = tree.create_tree_with_token(add_tok, parent)
+            tree.tree_append(parent, add_tree)
+            
+            register = self.assert_token(token.REGISTER)
+            parent, _ = tree.add_subtree(add_tree, register)
+
+            if self.peek()["Typ"] == token.REGISTER:
+                register2 = self.next_token()
+                parent, _ = tree.add_subtree(add_tree, register2)
+            elif self.peek()["Typ"] == token.INT:
+                int_tok = self.next_token()
+                parent, _ = tree.add_subtree(add_tree, int_tok)
+            else:
+                print("UNEXPECTED TOKEN", self.peek())
+
+            return self.parse_main(parent)
+        return return_func
+
+    def parse_eol(self, parent):
+        "parse_eol is a simple function basically ignoring the new line"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            self.next_token()
+
+            return self.parse_main(parent)
+        return return_func
+
+    def run(self):
+        "run starts the state machine"
+        state = self.parse_main(self.tree)
+        while state:
+            state = state()
+
+def parse_soa(incoming):
+    "parse_soa starts up the parser"
+    result_tree = tree.create_tree(None)
+    parse = Parser(incoming, result_tree)
+
+    parse.run()
+
+    return result_tree

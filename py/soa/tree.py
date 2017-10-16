@@ -3,8 +3,8 @@ tree.py handles all code related to the parse tree
 """
 
 def tree_append(parent, sub):
-    "appends a sub tree to the parent tree"
-    parent.Sub.append(sub)
+    "tree_append appends a sub tree to the parent tree"
+    parent["Sub"].append(sub)
 
 def add_subtree(parent, token):
     "add_subtree adds a subtree with a token to the parent"

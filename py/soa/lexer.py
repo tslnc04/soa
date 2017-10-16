@@ -2,8 +2,7 @@
 lexer.py contains the lexer class and its associated functions
 """
 
-import time
-import token
+from soa import token
 
 class Lexer():
     "Lexer is the main class for lexing"
@@ -83,6 +82,7 @@ class Lexer():
 
             if self.pos == (len(self.input_text) - 1):
                 self.ignore()
+                self.emit(token.EOF)
                 break
                 
             self.next_char()
@@ -91,6 +91,7 @@ class Lexer():
         "lex_values lexes registers and ints"
         while True:
             next_char = self.peek()
+            print("NEXT CHAR", next_char)
 
             if next_char == "R":
                 return self.lex_register
@@ -102,8 +103,8 @@ class Lexer():
                 return self.lex_eol
 
             if self.pos == (len(self.input_text) - 1):
-                print("EXITING")
                 self.ignore()
+                self.emit(token.EOF)
                 break
             
             self.next_char()
