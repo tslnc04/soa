@@ -4,10 +4,12 @@ lexer.py contains the lexer class and its associated functions
 
 from soa import token
 
+EOF_CHAR = chr(0)
+
 class Lexer():
     "Lexer is the main class for lexing"
     def __init__(self, input_text):
-        self.input_text = input_text
+        self.input_text = input_text + EOF_CHAR
         self.pos = 0
         self.buffer = []
         self.tokens = []
@@ -80,7 +82,7 @@ class Lexer():
             if token.is_eol(next_char):
                 return self.lex_eol
 
-            if self.pos == (len(self.input_text) - 1):
+            if next_char == EOF_CHAR:
                 self.ignore()
                 self.emit(token.EOF)
                 break
@@ -102,7 +104,7 @@ class Lexer():
             if token.is_eol(next_char):
                 return self.lex_eol
 
-            if self.pos == (len(self.input_text) - 1):
+            if next_char == EOF_CHAR:
                 self.ignore()
                 self.emit(token.EOF)
                 break

@@ -16,10 +16,7 @@ out R0
 with open("test.soa", "r") as f:
     code = f.read()
     f.close()
-
-# TODO: IMPLEMENT AN EOF
-# Just add a null byte to the end of the input text
-# This causes issues where there isn't an EOL before EOF
+    
 lexed = soa.lexer.lex_soa(code)
 
 print("----- LEXER -----\n")
