@@ -2,8 +2,7 @@
 parser.py is the module containing
 """
 
-from soa import token
-from soa import tree
+from soa import token, tree
 
 class Parser():
     "Parser handles most functions related to parsing"

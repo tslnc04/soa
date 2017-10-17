@@ -93,7 +93,6 @@ class Lexer():
         "lex_values lexes registers and ints"
         while True:
             next_char = self.peek()
-            print("NEXT CHAR", next_char)
 
             if next_char == "R":
                 return self.lex_register
