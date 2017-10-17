@@ -70,3 +70,16 @@ class Interpreter():
             value_register = get_register_value(add_tree["Sub"][1])
             value_register_value = self.get_registry(value_register)
             self.set_registry(add_register, value_register_value + current_value)
+
+    def interpret_out(self, out_tree):
+        "interpret_out prints out values"
+        to_print = []
+        for subtoken in out_tree["Sub"]:
+            if get_tree_type(subtoken) == token.INT:
+                token_value = get_int_value(subtoken)
+                to_print.append(token_value)
+            elif get_tree_type(subtoken) == token.REGISTER:
+                token_value = get_register_value(subtoken)
+                to_print.append(token_value)
+
+        print(" ".join(to_print))
