@@ -3,6 +3,7 @@ interpreter.py contains the interpreter class and its associated methods
 """
 
 from soa import token
+import time
 
 def get_register_value(register_tree):
     "get_int_value uses a tree to find the value of the register"
@@ -26,10 +27,10 @@ def get_tree_type(token_tree):
     return token_type
 
 class Interpreter():
-    "The Interpreter carries all of the methods related to the interpreter"
+    "Interpreter carries all of the methods related to the interpreter"
     def __init__(self, parse_tree):
         self.tree = parse_tree
-        self.registry = []
+        self.registry = [0] * 1000
 
     def get_registry(self, index):
         "get_registry gets the value of a spot on the registry"
@@ -41,7 +42,7 @@ class Interpreter():
 
     def set_registry(self, index, value):
         "set_registry sets the value at a spot on the register"
-        if not isinstance(value, x):
+        if not isinstance(value, int):
             print("REGISTERS MUST BE INTEGERS", value)
             exit(-1)
         
@@ -49,37 +50,84 @@ class Interpreter():
 
     def interpret_set(self, set_tree):
         "interpret_set adds functionality to the set keyword"
-        set_register = get_register_value(set_tree["Sub"][0])
-        
-        if get_tree_type(set_tree["Sub"][1]) == token.INT:
-            set_value = get_int_value(set_tree["Sub"][1])
-            self.set_registry(set_register, set_value)
-        elif get_tree_type(set_tree["Sub"][1]) == token.REGISTER:
-            value_register = get_register_value(set_tree["Sub"][1])
-            self.set_registry(set_register, self.get_registry(value_register))
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal set_tree
+
+            set_register = get_register_value(set_tree["Sub"][0])
+            
+            if get_tree_type(set_tree["Sub"][1]) == token.INT:
+                set_value = get_int_value(set_tree["Sub"][1])
+                self.set_registry(set_register, set_value)
+            elif get_tree_type(set_tree["Sub"][1]) == token.REGISTER:
+                value_register = get_register_value(set_tree["Sub"][1])
+                self.set_registry(set_register, self.get_registry(value_register))
+            
+            return self.interpret_main
+        return inner_function
 
     def interpret_add(self, add_tree):
         "interpret_add adds two values together"
-        add_register = get_register_value(add_tree["Sub"][0])
-        current_value = self.get_registry(add_register)
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal add_tree
 
-        if get_tree_type(add_tree["Sub"][1]) == token.INT:
-            add_value = get_int_value(add_tree["Sub"][1])
-            self.set_registry(add_register, add_value + current_value)
-        elif get_tree_type(add_tree["Sub"][1]) == token.REGISTER:
-            value_register = get_register_value(add_tree["Sub"][1])
-            value_register_value = self.get_registry(value_register)
-            self.set_registry(add_register, value_register_value + current_value)
+            add_register = get_register_value(add_tree["Sub"][0])
+            current_value = self.get_registry(add_register)
+
+            if get_tree_type(add_tree["Sub"][1]) == token.INT:
+                add_value = get_int_value(add_tree["Sub"][1])
+                self.set_registry(add_register, add_value + current_value)
+            elif get_tree_type(add_tree["Sub"][1]) == token.REGISTER:
+                value_register = get_register_value(add_tree["Sub"][1])
+                value_register_value = self.get_registry(value_register)
+                self.set_registry(add_register, value_register_value + current_value)
+
+            return self.interpret_main
+        return inner_function
 
     def interpret_out(self, out_tree):
         "interpret_out prints out values"
-        to_print = []
-        for subtoken in out_tree["Sub"]:
-            if get_tree_type(subtoken) == token.INT:
-                token_value = get_int_value(subtoken)
-                to_print.append(token_value)
-            elif get_tree_type(subtoken) == token.REGISTER:
-                token_value = get_register_value(subtoken)
-                to_print.append(token_value)
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal out_tree
 
-        print(" ".join(to_print))
+            to_print = []
+            for subtoken in out_tree["Sub"]:
+                if get_tree_type(subtoken) == token.INT:
+                    token_value = get_int_value(subtoken)
+                    to_print.append(token_value)
+                elif get_tree_type(subtoken) == token.REGISTER:
+                    token_value = get_register_value(subtoken)
+                    to_print.append(token_value)
+
+            print(" ".join(to_print))
+            return self.interpret_main
+        return inner_function
+
+    def interpret_main(self):
+        "interpret_main is the loop that calls functions to actually interpret parts of code"
+        print("FULL TREE", self.tree)
+        for subtree in self.tree["Sub"]:
+            print("SUBTREE", subtree)
+            time.sleep(0.25)
+            if get_tree_type(subtree) == token.SET:
+                return self.interpret_set(subtree)
+            elif get_tree_type(subtree) == token.OUT:
+                return self.interpret_out(subtree)
+            elif get_tree_type(subtree) == token.ADD:
+                return self.interpret_add(subtree)
+            
+            return None
+    
+    def run(self):
+        "run starts the state machine"
+        state = self.interpret_main
+        while state:
+            state = state()
+
+def interpret_soa(parse_tree):
+    "interpret_soa starts interpreting the parse tree"
+    interpreter = Interpreter(parse_tree)
+
+    interpreter.run()

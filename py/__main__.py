@@ -7,6 +7,7 @@ import soa.lexer
 import soa.parser
 import soa.token
 import soa.tests
+import soa.interpreter
 
 code = """
 set R0 1
@@ -30,3 +31,5 @@ soa.token.print_tokens(lexed)
 print("\n----- PARSER -----\n")
 parsed = soa.parser.parse_soa(lexed)
 print(str(parsed).replace("'", '"').replace("...", "").replace("None", "null"))
+print("\n----- INTERPRETER -----\n")
+soa.interpreter.interpret_soa(parsed)
