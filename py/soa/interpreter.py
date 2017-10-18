@@ -31,6 +31,17 @@ class Interpreter():
     def __init__(self, parse_tree):
         self.tree = parse_tree
         self.registry = [0] * 1000
+        self._subtree_pos = 0
+
+    def get_next_subtree(self):
+        "get_next_subtree gets the next subtree for use in interpret_main"
+        if self._subtree_pos == len(self.tree["Sub"]):
+            return None
+        
+        return_tree = self.tree["Sub"][self._subtree_pos]
+        self._subtree_pos += 1
+
+        return return_tree
 
     def get_registry(self, index):
         "get_registry gets the value of a spot on the registry"
@@ -96,10 +107,10 @@ class Interpreter():
             for subtoken in out_tree["Sub"]:
                 if get_tree_type(subtoken) == token.INT:
                     token_value = get_int_value(subtoken)
-                    to_print.append(token_value)
+                    to_print.append(str(token_value))
                 elif get_tree_type(subtoken) == token.REGISTER:
                     token_value = get_register_value(subtoken)
-                    to_print.append(token_value)
+                    to_print.append(str(token_value))
 
             print(" ".join(to_print))
             return self.interpret_main
@@ -107,9 +118,12 @@ class Interpreter():
 
     def interpret_main(self):
         "interpret_main is the loop that calls functions to actually interpret parts of code"
-        print("FULL INTERPRET TREE", str(self.tree).replace("'", '"').replace("...", "").replace("None", "null"))
-        for subtree in self.tree["Sub"]:
-            print("SUBTREE", str(subtree).replace("'", '"').replace("...", "").replace("None", "null"))
+        while True:
+            subtree = self.get_next_subtree()
+
+            if subtree is None:
+                return None
+            
             if get_tree_type(subtree) == token.SET:
                 return self.interpret_set(subtree)
             elif get_tree_type(subtree) == token.OUT:
@@ -123,6 +137,7 @@ class Interpreter():
         "run starts the state machine"
         state = self.interpret_main
         while state:
+            time.sleep(0.25)
             state = state()
 
 def interpret_soa(parse_tree):
