@@ -40,6 +40,7 @@ class Parser():
         def return_func():
             "return_func is an inner function supposed to be anonymous"
             nonlocal parent
+            print("MAIN TREE", str(self.tree).replace("'", '"').replace("...", "").replace("None", "null"))
 
             tok = self.peek()
 
@@ -71,14 +72,14 @@ class Parser():
             tree.tree_append(parent, set_tree)
             
             register = self.assert_token(token.REGISTER)
-            parent, _ = tree.add_subtree(set_tree, register)
+            tree.add_subtree(set_tree, register)
 
             if self.peek()["Typ"] == token.REGISTER:
                 register2 = self.next_token()
-                parent, _ = tree.add_subtree(set_tree, register2)
+                tree.add_subtree(set_tree, register2)
             elif self.peek()["Typ"] == token.INT:
                 int_tok = self.next_token()
-                parent, _ = tree.add_subtree(set_tree, int_tok)
+                tree.add_subtree(set_tree, int_tok)
             else:
                 print("UNEXPECTED TOKEN", self.peek())
 
@@ -98,7 +99,7 @@ class Parser():
 
             while self.peek()["Typ"] in [token.REGISTER, token.INT]:
                 tok = self.next_token()
-                parent, _ = tree.add_subtree(out_tree, tok)
+                tree.add_subtree(out_tree, tok)
 
             return self.parse_main(parent)
         return return_func
@@ -114,14 +115,14 @@ class Parser():
             tree.tree_append(parent, add_tree)
             
             register = self.assert_token(token.REGISTER)
-            parent, _ = tree.add_subtree(add_tree, register)
+            tree.add_subtree(add_tree, register)
 
             if self.peek()["Typ"] == token.REGISTER:
                 register2 = self.next_token()
-                parent, _ = tree.add_subtree(add_tree, register2)
+                tree.add_subtree(add_tree, register2)
             elif self.peek()["Typ"] == token.INT:
                 int_tok = self.next_token()
-                parent, _ = tree.add_subtree(add_tree, int_tok)
+                tree.add_subtree(add_tree, int_tok)
             else:
                 print("UNEXPECTED TOKEN", self.peek())
 

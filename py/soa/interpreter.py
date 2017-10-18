@@ -107,10 +107,9 @@ class Interpreter():
 
     def interpret_main(self):
         "interpret_main is the loop that calls functions to actually interpret parts of code"
-        print("FULL TREE", self.tree)
+        print("FULL INTERPRET TREE", str(self.tree).replace("'", '"').replace("...", "").replace("None", "null"))
         for subtree in self.tree["Sub"]:
-            print("SUBTREE", subtree)
-            time.sleep(0.25)
+            print("SUBTREE", str(subtree).replace("'", '"').replace("...", "").replace("None", "null"))
             if get_tree_type(subtree) == token.SET:
                 return self.interpret_set(subtree)
             elif get_tree_type(subtree) == token.OUT:
