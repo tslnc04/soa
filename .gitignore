@@ -53,3 +53,6 @@ dkms.conf
 
 # Release Package
 soa_*.zip
+
+# Mac being a pain
+.DS_store
