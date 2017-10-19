@@ -55,4 +55,4 @@ dkms.conf
 soa_*.zip
 
 # Mac being a pain
-.DS_store
+.DS_Store
