@@ -2,7 +2,7 @@
 parser.py is the module containing
 """
 
-from soa import token, tree
+from soa import token, tree, errors
 
 class Parser():
     "Parser handles most functions related to parsing"
@@ -28,10 +28,10 @@ class Parser():
         tok = self.next_token()
         
         if tok is None:
-            print("EXPEXTING", token_type, "GOT NOTHING")
+            errors.print_error_and_exit("InvalidToken", "expecting " + str(token_type) + " got " + str(tok), tok["Pos"])
         
         if tok["Typ"] != token_type:
-            print("EXPECTING", token_type, "GOT", tok)
+            errors.print_error_and_exit("InvalidToken", "expecting " + str(token_type) + " got " + str(tok), tok["Pos"])
 
         return tok
 
@@ -40,7 +40,6 @@ class Parser():
         def return_func():
             "return_func is an inner function supposed to be anonymous"
             nonlocal parent
-            print("MAIN TREE", str(self.tree).replace("'", '"').replace("...", "").replace("None", "null"))
 
             tok = self.peek()
 
@@ -81,7 +80,7 @@ class Parser():
                 int_tok = self.next_token()
                 tree.add_subtree(set_tree, int_tok)
             else:
-                print("UNEXPECTED TOKEN", self.peek())
+                errors.print_error_and_exit("InvalidToken", "expecting " + self.peek()["Typ"] + " got " + str(self.peek()), self.peek()["Pos"])
 
             return self.parse_main(parent)
         return return_func
@@ -94,7 +93,6 @@ class Parser():
 
             out = self.next_token()
             out_tree = tree.create_tree_with_token(out, parent)
-            # Who knows if this works, python has weird call by reference rules
             tree.tree_append(parent, out_tree)
 
             while self.peek()["Typ"] in [token.REGISTER, token.INT]:
@@ -124,7 +122,7 @@ class Parser():
                 int_tok = self.next_token()
                 tree.add_subtree(add_tree, int_tok)
             else:
-                print("UNEXPECTED TOKEN", self.peek())
+                errors.print_error_and_exit("InvalidToken", "expecting " + self.peek()["Typ"] + " got " + str(self.peek()), self.peek()["Pos"])
 
             return self.parse_main(parent)
         return return_func

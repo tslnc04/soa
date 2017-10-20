@@ -30,7 +30,7 @@ def is_eol(char):
 
 def is_digit(char):
     "is_digit tests is a given character is a numerical digit"
-    return (ord(char) in [(ord("0") + x) for x in range(10)])
+    return (ord(char) in [(ord("0") + x) for x in range(10)] or ord(char) == ord("-"))
 
 def print_tokens(tokens):
     "print_tokens is a prettier way of printing the tokens array"

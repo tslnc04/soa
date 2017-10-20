@@ -16,9 +16,9 @@ out R0
 """
 
 print("----- TEST SUITE -----\n")
-print("LEX SET", soa.tests.test_set_lexing())
-print("LEX OUT", soa.tests.test_out_lexing())
-print("LEX ADD", soa.tests.test_add_lexing())
+print("TEST LEX SET", soa.tests.test_set_lexing())
+print("TEST LEX OUT", soa.tests.test_out_lexing())
+print("TEST LEX ADD", soa.tests.test_add_lexing())
 
 with open("test.soa", "r") as f:
     code = f.read()

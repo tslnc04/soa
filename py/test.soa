@@ -1,3 +1,3 @@
-set R0 1
-add R0 10
+set R0 72
+add R0 -10
 out R0

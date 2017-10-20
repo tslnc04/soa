@@ -2,8 +2,7 @@
 interpreter.py contains the interpreter class and its associated methods
 """
 
-from soa import token
-import time
+from soa import token, errors
 
 def get_register_value(register_tree):
     "get_int_value uses a tree to find the value of the register"
@@ -46,17 +45,20 @@ class Interpreter():
     def get_registry(self, index):
         "get_registry gets the value of a spot on the registry"
         if index >= len(self.registry):
-            print("INDEX OUT OF RANGE", index)
-            exit(-1)
+            errors.print_error_and_exit("InvalidRegister", "expecting " + str(len(self.registry)) + "< got " + str(index), 0)
 
         return self.registry[index]
 
     def set_registry(self, index, value):
         "set_registry sets the value at a spot on the register"
         if not isinstance(value, int):
-            print("REGISTERS MUST BE INTEGERS", value)
-            exit(-1)
-        
+            errors.print_error_and_exit("InvalidType", "expecting int, got " + str(type(value)), 0)
+        elif not isinstance(index, int):
+            errors.print_error_and_exit("InvalidRegister", "expecting R<int>, got R<" + str(type(value)) + ">", 0)
+
+        if index >= len(self.registry):
+            errors.print_error_and_exit("InvalidRegister", "expecting " + str(len(self.registry)) + "< got " + str(index), 0)
+
         self.registry[index] = value
 
     def interpret_set(self, set_tree):
@@ -106,11 +108,13 @@ class Interpreter():
             to_print = []
             for subtoken in out_tree["Sub"]:
                 if get_tree_type(subtoken) == token.INT:
-                    token_value = get_int_value(subtoken)
+                    token_value = self.get_registry(get_int_value(subtoken))
                     to_print.append(str(token_value))
                 elif get_tree_type(subtoken) == token.REGISTER:
-                    token_value = get_register_value(subtoken)
+                    token_value = self.get_registry(get_register_value(subtoken))
                     to_print.append(str(token_value))
+                
+                print(to_print)
 
             print(" ".join(to_print))
             return self.interpret_main
@@ -137,7 +141,6 @@ class Interpreter():
         "run starts the state machine"
         state = self.interpret_main
         while state:
-            time.sleep(0.25)
             state = state()
 
 def interpret_soa(parse_tree):
