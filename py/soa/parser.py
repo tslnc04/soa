@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 parser.py is the module containing
 """
 

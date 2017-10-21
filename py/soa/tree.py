@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 tree.py handles all code related to the parse tree
 """
 

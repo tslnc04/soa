@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 errors.py is some error handling for the lexer, parser, and interpreter
 """
 

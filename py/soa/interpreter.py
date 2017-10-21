@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 interpreter.py contains the interpreter class and its associated methods
 """
 

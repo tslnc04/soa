@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 lexer.py contains the lexer class and its associated functions
 """
 

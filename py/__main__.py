@@ -1,6 +1,7 @@
 """
-__main__.py
-runs code? I haven't a clue on how to use directories as modules in python
+Copyright 2017 Timothy Laskoski
+
+__main__.py runs code? I haven't a clue on how to use directories as modules in python
 """
 
 import soa.lexer

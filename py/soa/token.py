@@ -1,4 +1,6 @@
 """
+Copyright 2017 Timothy Laskoski
+
 token.py contains the code for token types and some basic character tests
 """
 
