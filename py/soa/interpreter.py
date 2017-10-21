@@ -113,8 +113,6 @@ class Interpreter():
                 elif get_tree_type(subtoken) == token.REGISTER:
                     token_value = self.get_registry(get_register_value(subtoken))
                     to_print.append(str(token_value))
-                
-                print(to_print)
 
             print(" ".join(to_print))
             return self.interpret_main
