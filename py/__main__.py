@@ -1,20 +1,10 @@
 """
 Copyright 2017 Timothy Laskoski
 
-__main__.py runs code? I haven't a clue on how to use directories as modules in python
+__main__.py runs the test suite for now
 """
 
-import soa.lexer
-import soa.parser
-import soa.token
 import soa.tests
-import soa.interpreter
-
-code = """
-set R0 1
-add R0 1
-out R0
-"""
 
 print("----- TEST SUITE -----\n")
 print("TEST LEX SET", soa.tests.test_set_lexing())
@@ -24,12 +14,16 @@ print()
 print("TEST PARSE SET", soa.tests.test_set_parsing())
 print("TEST PARSE OUT", soa.tests.test_out_parsing())
 print("TEST PARSE ADD", soa.tests.test_add_parsing())
+print()
+print("TEST INTERPRET SET", soa.tests.test_set_interpreting())
+soa.tests.test_out_interpreting()
+print("TEST INTERPRET OUT [SHOULD SEE '0 0' ABOVE]")
+print("TEST INTERPRET ADD", soa.tests.test_set_interpreting())
 
-with open("test.soa", "r") as f:
-    code = f.read()
-    f.close()
-    
-lexed = soa.lexer.lex_soa(code)
+# with open("test.soa", "r") as f:
+#     code = f.read()
+#     f.close() 
+# lexed = soa.lexer.lex_soa(code)
 
 # print("\n----- LEXER -----\n")
 # soa.token.print_tokens(lexed)
