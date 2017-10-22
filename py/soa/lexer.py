@@ -19,7 +19,7 @@ class Lexer():
     def next_char(self):
         "next moves the position over and returns the next character"
         if self.pos >= len(self.input_text):
-            return chr(0)      
+            return chr(0)
         
         char = self.input_text[self.pos]
         self.pos += 1
@@ -80,6 +80,8 @@ class Lexer():
                 return self.lex_out
             elif self.follow("add"):
                 return self.lex_add
+            elif self.follow("exit"):
+                return self.lex_exit
             
             if token.is_eol(next_char):
                 return self.lex_eol
@@ -147,6 +149,14 @@ class Lexer():
         self.ignore()
         self.forward(3)
         self.emit(token.ADD)
+
+        return self.lex_values
+
+    def lex_exit(self):
+        "lex_exit produces an exit token"
+        self.ignore()
+        self.forward(4)
+        self.emit(token.EXIT)
 
         return self.lex_values
 

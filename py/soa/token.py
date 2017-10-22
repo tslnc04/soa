@@ -9,21 +9,27 @@ EOF = 1
 EOL = 2
 
 REGISTER = 3
+INT = 4
 
-SET = 4
-OUT = 5
-ADD = 6
-
-INT = 7
+SET = 5
+OUT = 6
+ADD = 7
+EXIT = 8
+IF = 9
+FI = 10
 
 TOKEN_NAMES = [
     "error",
     "eof",
     "eol",
     "register",
+    "int",
     "set",
     "out",
-    "add"
+    "add",
+    "exit",
+    "if",
+    "fi"
 ]
 
 def is_eol(char):

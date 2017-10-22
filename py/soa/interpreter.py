@@ -120,6 +120,11 @@ class Interpreter():
             return self.interpret_main
         return inner_function
 
+    def interpret_exit(self):
+        "interpret_exit exits the program"
+        
+        return None
+
     def interpret_main(self):
         "interpret_main is the loop that calls functions to actually interpret parts of code"
         while True:

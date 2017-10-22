@@ -14,6 +14,9 @@ class Parser():
     
     def next_token(self):
         "next_token advances to the next token"
+        if not self.incoming:
+            errors.print_error_and_exit("InvalidToken", "expecting token stream, got nothing", 0)
+
         tok = self.incoming[0]
         self.incoming = self.incoming[1:]
 
@@ -21,6 +24,9 @@ class Parser():
 
     def peek(self):
         "peek is like next, but without advancing the buffer"
+        if not self.incoming:
+            errors.print_error_and_exit("InvalidToken", "expecting token stream, got nothing", 0)
+
         tok = self.incoming[0]
 
         return tok
@@ -56,6 +62,8 @@ class Parser():
                 return self.parse_add(parent)
             elif tok["Typ"] == token.EOL:
                 return self.parse_eol(parent)
+            elif tok["Typ"] == token.EXIT:
+                return self.parse_exit(parent)
             elif tok["Typ"] == token.EOF:
                 return None
 
@@ -125,6 +133,19 @@ class Parser():
                 tree.add_subtree(add_tree, int_tok)
             else:
                 errors.print_error_and_exit("InvalidToken", "expecting " + self.peek()["Typ"] + " got " + str(self.peek()), self.peek()["Pos"])
+
+            return self.parse_main(parent)
+        return return_func
+
+    def parse_exit(self, parent):
+        "parse_exit adds the exit token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            exit_tok = self.next_token()
+            exit_tree = tree.create_tree_with_token(exit_tok, parent)
+            tree.tree_append(parent, exit_tree)
 
             return self.parse_main(parent)
         return return_func
