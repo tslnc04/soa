@@ -73,3 +73,18 @@ def test_exit_lexing():
         return True
 
     return False
+
+def test_comment_lexing():
+    "Tests if the lexer properly lexes an exit"
+    code = "# This is a comment"
+
+    output = soa.lexer.lex_soa(code)
+
+    expected = [
+        {"Pos": 19, "Typ": soa.token.EOF, "Val": ""}
+    ]
+
+    if output == expected:
+        return True
+
+    return False

@@ -5,6 +5,7 @@ lexer.py contains the lexer class and its associated functions
 """
 
 from soa import token
+import time
 
 EOF_CHAR = chr(0)
 
@@ -73,6 +74,9 @@ class Lexer():
         "lex_main is the main loop for the lexer"
         while True:
             next_char = self.peek()
+
+            if next_char == "#":
+                return self.lex_comment
             
             if self.follow("set"):
                 return self.lex_set
@@ -100,6 +104,8 @@ class Lexer():
 
             if next_char == "R":
                 return self.lex_register
+            elif next_char == "#":
+                return self.lex_comment
 
             if token.is_digit(next_char):
                 return self.lex_int
@@ -113,6 +119,17 @@ class Lexer():
                 break
             
             self.next_char()
+
+    def lex_comment(self):
+        "lex_comment just ignores the rest of the line"
+        x = self.peek()
+        while x != EOF_CHAR:
+            self.next_char()
+            x = self.peek()
+
+        self.ignore()
+
+        return self.lex_main
     
     def lex_register(self):
         "lex_register produces a register token"
