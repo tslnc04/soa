@@ -86,6 +86,10 @@ class Lexer():
                 return self.lex_add
             elif self.follow("exit"):
                 return self.lex_exit
+            elif self.follow("if"):
+                return self.lex_if
+            elif self.follow("fi"):
+                return self.lex_fi
             
             if token.is_eol(next_char):
                 return self.lex_eol
@@ -168,6 +172,22 @@ class Lexer():
         self.emit(token.ADD)
 
         return self.lex_values
+
+    def lex_if(self):
+        "lex_if produces an if token"
+        self.ignore()
+        self.forward(2)
+        self.emit(token.IF)
+
+        return self.lex_main
+
+    def lex_fi(self):
+        "lex_fi produces a fi token"
+        self.ignore()
+        self.forward(2)
+        self.emit(token.FI)
+
+        return self.lex_main
 
     def lex_exit(self):
         "lex_exit produces an exit token"

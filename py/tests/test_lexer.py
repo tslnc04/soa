@@ -88,3 +88,35 @@ def test_comment_lexing():
         return True
 
     return False
+
+def test_if_lexing():
+    "Tests if the lexer properly lexes an if"
+    code = "if"
+
+    output = soa.lexer.lex_soa(code)
+
+    expected = [
+        {"Pos": 2, "Typ": soa.token.IF, "Val": "if"},
+        {"Pos": 2, "Typ": soa.token.EOF, "Val": ""}
+    ]
+
+    if output == expected:
+        return True
+
+    return False
+
+def test_fi_lexing():
+    "Tests if the lexer properly lexes an fi"
+    code = "fi"
+
+    output = soa.lexer.lex_soa(code)
+
+    expected = [
+        {"Pos": 2, "Typ": soa.token.FI, "Val": "fi"},
+        {"Pos": 2, "Typ": soa.token.EOF, "Val": ""}
+    ]
+
+    if output == expected:
+        return True
+
+    return False
