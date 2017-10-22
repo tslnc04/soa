@@ -1,0 +1,4 @@
+set R0 10
+if R0 = 10
+    out R0
+fi
