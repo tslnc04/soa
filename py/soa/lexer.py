@@ -5,7 +5,6 @@ lexer.py contains the lexer class and its associated functions
 """
 
 from soa import token
-import time
 
 EOF_CHAR = chr(0)
 

@@ -175,7 +175,7 @@ class Parser():
             if_tree = tree.create_tree_with_token(if_token, parent)
             tree.tree_append(parent, if_tree)
 
-            for i in range(2):
+            for _ in range(2):
                 if self.peek()["Typ"] == token.REGISTER:
                     register = self.next_token()
                     tree.add_subtree(if_tree, register)
