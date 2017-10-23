@@ -161,6 +161,39 @@ class Parser():
             return self.parse_main(parent)
         return return_func
 
+    def parse_if(self, parent):
+        "parse_if adds the if token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            if_token = self.next_token()
+            if_tree = tree.create_tree_with_token(if_token, parent)
+            tree.tree_append(parent, if_tree)
+
+            for i in range(2):
+                if self.peek()["Typ"] == token.REGISTER:
+                    register = self.next_token()
+                    tree.add_subtree(if_tree, register)
+                elif self.peek()["Typ"] == token.INT:
+                    int_tok = self.next_token()
+                    tree.add_subtree(if_tree, int_tok)
+
+            return self.parse_main(if_tree)
+        return return_func
+
+    def parse_fi(self, parent):
+        "parse_if adds the fi token to the if tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            fi_token = self.next_token()
+            tree.add_subtree(parent, fi_token)
+
+            return self.parse_main(parent["Par"])
+        return return_func
+
     def run(self):
         "run starts the state machine"
         state = self.parse_main(self.tree)
