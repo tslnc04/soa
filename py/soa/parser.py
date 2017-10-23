@@ -64,6 +64,10 @@ class Parser():
                 return self.parse_eol(parent)
             elif tok["Typ"] == token.EXIT:
                 return self.parse_exit(parent)
+            elif tok["Typ"] == token.IF:
+                return self.parse_if(parent)
+            elif tok["Typ"] == token.FI:
+                return self.parse_fi(parent)
             elif tok["Typ"] == token.EOF:
                 return None
 
