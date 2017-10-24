@@ -1,3 +1,5 @@
 set R0 72
+if R0 72
 add R0 -10
+fi
 out R0

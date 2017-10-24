@@ -14,6 +14,9 @@ class Parser():
     
     def next_token(self):
         "next_token advances to the next token"
+        if not self.incoming:
+            errors.print_error_and_exit("InvalidToken", "expecting token stream, got nothing", 0)
+
         tok = self.incoming[0]
         self.incoming = self.incoming[1:]
 
@@ -21,6 +24,9 @@ class Parser():
 
     def peek(self):
         "peek is like next, but without advancing the buffer"
+        if not self.incoming:
+            errors.print_error_and_exit("InvalidToken", "expecting token stream, got nothing", 0)
+
         tok = self.incoming[0]
 
         return tok
@@ -56,6 +62,12 @@ class Parser():
                 return self.parse_add(parent)
             elif tok["Typ"] == token.EOL:
                 return self.parse_eol(parent)
+            elif tok["Typ"] == token.EXIT:
+                return self.parse_exit(parent)
+            elif tok["Typ"] == token.IF:
+                return self.parse_if(parent)
+            elif tok["Typ"] == token.FI:
+                return self.parse_fi(parent)
             elif tok["Typ"] == token.EOF:
                 return None
 
@@ -129,6 +141,19 @@ class Parser():
             return self.parse_main(parent)
         return return_func
 
+    def parse_exit(self, parent):
+        "parse_exit adds the exit token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            exit_tok = self.next_token()
+            exit_tree = tree.create_tree_with_token(exit_tok, parent)
+            tree.tree_append(parent, exit_tree)
+
+            return self.parse_main(parent)
+        return return_func
+
     def parse_eol(self, parent):
         "parse_eol is a simple function basically ignoring the new line"
         def return_func():
@@ -138,6 +163,39 @@ class Parser():
             self.next_token()
 
             return self.parse_main(parent)
+        return return_func
+
+    def parse_if(self, parent):
+        "parse_if adds the if token to the main tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            if_token = self.next_token()
+            if_tree = tree.create_tree_with_token(if_token, parent)
+            tree.tree_append(parent, if_tree)
+
+            for _ in range(2):
+                if self.peek()["Typ"] == token.REGISTER:
+                    register = self.next_token()
+                    tree.add_subtree(if_tree, register)
+                elif self.peek()["Typ"] == token.INT:
+                    int_tok = self.next_token()
+                    tree.add_subtree(if_tree, int_tok)
+
+            return self.parse_main(if_tree)
+        return return_func
+
+    def parse_fi(self, parent):
+        "parse_if adds the fi token to the if tree"
+        def return_func():
+            "return_func is an inner function supposed to be anonymous"
+            nonlocal parent
+
+            fi_token = self.next_token()
+            tree.add_subtree(parent, fi_token)
+
+            return self.parse_main(parent["Par"])
         return return_func
 
     def run(self):

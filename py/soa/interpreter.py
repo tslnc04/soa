@@ -5,6 +5,7 @@ interpreter.py contains the interpreter class and its associated methods
 """
 
 from soa import token, errors
+import time
 
 def get_register_value(register_tree):
     "get_int_value uses a tree to find the value of the register"
@@ -15,6 +16,9 @@ def get_register_value(register_tree):
 
 def get_int_value(int_tree):
     "get_int_value uses a tree to find the integer value of the token"
+    if not int_tree["Tok"]:
+        return None
+
     int_token = int_tree["Tok"]
     int_value = int_token["Val"]
 
@@ -22,6 +26,9 @@ def get_int_value(int_tree):
 
 def get_tree_type(token_tree):
     "get_tree_type returns the token type of the token in a tree"
+    if not token_tree["Tok"]:
+        return None
+
     token_token = token_tree["Tok"]
     token_type = token_token["Typ"]
 
@@ -31,16 +38,15 @@ class Interpreter():
     "Interpreter carries all of the methods related to the interpreter"
     def __init__(self, parse_tree):
         self.tree = parse_tree
-        self.registry = [0] * 1000
-        self._subtree_pos = 0
+        self.registry = [0]
 
-    def get_next_subtree(self):
+    def get_next_subtree(self, parent):
         "get_next_subtree gets the next subtree for use in interpret_main"
-        if self._subtree_pos == len(self.tree["Sub"]):
+        if not parent["Sub"]:
             return None
         
-        return_tree = self.tree["Sub"][self._subtree_pos]
-        self._subtree_pos += 1
+        return_tree = parent["Sub"][0]
+        del parent["Sub"][0]
 
         return return_tree
 
@@ -59,7 +65,7 @@ class Interpreter():
             errors.print_error_and_exit("InvalidRegister", "expecting R<int>, got R<" + str(type(value)) + ">", 0)
 
         if index >= len(self.registry):
-            errors.print_error_and_exit("InvalidRegister", "expecting " + str(len(self.registry)) + "< got " + str(index), 0)
+            self.registry += ((index + 1) - len(self.registry)) * [0]
 
         self.registry[index] = value
 
@@ -78,7 +84,7 @@ class Interpreter():
                 value_register = get_register_value(set_tree["Sub"][1])
                 self.set_registry(set_register, self.get_registry(value_register))
             
-            return self.interpret_main
+            return self.interpret_main(self.tree)
         return inner_function
 
     def interpret_add(self, add_tree):
@@ -98,7 +104,7 @@ class Interpreter():
                 value_register_value = self.get_registry(value_register)
                 self.set_registry(add_register, value_register_value + current_value)
 
-            return self.interpret_main
+            return self.interpret_main(self.tree)
         return inner_function
 
     def interpret_out(self, out_tree):
@@ -110,36 +116,81 @@ class Interpreter():
             to_print = []
             for subtoken in out_tree["Sub"]:
                 if get_tree_type(subtoken) == token.INT:
-                    token_value = self.get_registry(get_int_value(subtoken))
+                    token_value = get_int_value(subtoken)
                     to_print.append(str(token_value))
                 elif get_tree_type(subtoken) == token.REGISTER:
                     token_value = self.get_registry(get_register_value(subtoken))
                     to_print.append(str(token_value))
 
             print(" ".join(to_print))
-            return self.interpret_main
+
+            return self.interpret_main(self.tree)
         return inner_function
 
-    def interpret_main(self):
-        "interpret_main is the loop that calls functions to actually interpret parts of code"
-        while True:
-            subtree = self.get_next_subtree()
+    def interpret_exit(self):
+        "interpret_exit exits the program"
+        
+        return None
 
-            if subtree is None:
+    def interpret_if(self, if_tree):
+        "interpret_if evaluates the expression and handles the code inside"
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal if_tree
+
+            to_compare = []
+            for i in range(2):
+                if get_tree_type(if_tree["Sub"][i]) == token.INT:
+                    int_value = get_int_value(if_tree["Sub"][i])
+                    to_compare.append(int_value)
+                elif get_tree_type(if_tree["Sub"][i]) == token.REGISTER:
+                    register_value = self.get_registry(get_register_value(if_tree["Sub"][i]))
+                    to_compare.append(register_value)
+
+            del if_tree["Sub"][:2] 
+
+            if to_compare[0] == to_compare[1]:
+                return self.interpret_main(if_tree)
+
+            return self.interpret_main(if_tree["Par"])
+        return inner_function
+
+    def interpret_fi(self, if_tree):
+        "interpret_fi brings the execution of code to outside of the if statement"
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal if_tree
+
+            return self.interpret_main(if_tree["Par"])
+        return inner_function
+
+    def interpret_main(self, parent):
+        "interpret_main is the loop that calls functions to actually interpret parts of code"
+        def inner_function():
+            "inner_function exists due to python not allowing anonymous functions"
+            nonlocal parent
+            while True:
+                subtree = self.get_next_subtree(parent)
+                if subtree is None:
+                    return None
+                
+                if get_tree_type(subtree) == token.SET:
+                    return self.interpret_set(subtree)
+                elif get_tree_type(subtree) == token.OUT:
+                    return self.interpret_out(subtree)
+                elif get_tree_type(subtree) == token.ADD:
+                    return self.interpret_add(subtree)
+                elif get_tree_type(subtree) == token.IF:
+                    return self.interpret_if(subtree)
+                elif get_tree_type(subtree) == token.FI:
+                    return self.interpret_fi(parent)
+                
                 return None
-            
-            if get_tree_type(subtree) == token.SET:
-                return self.interpret_set(subtree)
-            elif get_tree_type(subtree) == token.OUT:
-                return self.interpret_out(subtree)
-            elif get_tree_type(subtree) == token.ADD:
-                return self.interpret_add(subtree)
-            
-            return None
+        return inner_function
     
     def run(self):
         "run starts the state machine"
-        state = self.interpret_main
+        state = self.interpret_main(self.tree)
         while state:
             state = state()
 

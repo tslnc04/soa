@@ -19,7 +19,7 @@ class Lexer():
     def next_char(self):
         "next moves the position over and returns the next character"
         if self.pos >= len(self.input_text):
-            return chr(0)      
+            return chr(0)
         
         char = self.input_text[self.pos]
         self.pos += 1
@@ -73,6 +73,9 @@ class Lexer():
         "lex_main is the main loop for the lexer"
         while True:
             next_char = self.peek()
+
+            if next_char == "#":
+                return self.lex_comment
             
             if self.follow("set"):
                 return self.lex_set
@@ -80,6 +83,12 @@ class Lexer():
                 return self.lex_out
             elif self.follow("add"):
                 return self.lex_add
+            elif self.follow("exit"):
+                return self.lex_exit
+            elif self.follow("if"):
+                return self.lex_if
+            elif self.follow("fi"):
+                return self.lex_fi
             
             if token.is_eol(next_char):
                 return self.lex_eol
@@ -98,6 +107,8 @@ class Lexer():
 
             if next_char == "R":
                 return self.lex_register
+            elif next_char == "#":
+                return self.lex_comment
 
             if token.is_digit(next_char):
                 return self.lex_int
@@ -111,6 +122,17 @@ class Lexer():
                 break
             
             self.next_char()
+
+    def lex_comment(self):
+        "lex_comment just ignores the rest of the line"
+        x = self.peek()
+        while x != EOF_CHAR:
+            self.next_char()
+            x = self.peek()
+
+        self.ignore()
+
+        return self.lex_main
     
     def lex_register(self):
         "lex_register produces a register token"
@@ -147,6 +169,30 @@ class Lexer():
         self.ignore()
         self.forward(3)
         self.emit(token.ADD)
+
+        return self.lex_values
+
+    def lex_if(self):
+        "lex_if produces an if token"
+        self.ignore()
+        self.forward(2)
+        self.emit(token.IF)
+
+        return self.lex_values
+
+    def lex_fi(self):
+        "lex_fi produces a fi token"
+        self.ignore()
+        self.forward(2)
+        self.emit(token.FI)
+
+        return self.lex_main
+
+    def lex_exit(self):
+        "lex_exit produces an exit token"
+        self.ignore()
+        self.forward(4)
+        self.emit(token.EXIT)
 
         return self.lex_values
 

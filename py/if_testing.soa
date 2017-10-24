@@ -1,0 +1,22 @@
+# Version 1 (optional tab)
+set R0 10
+if R0 = 10
+    out R0
+fi
+
+# Version 2 (optional tab)
+set R0 10
+if R0 = 10
+    out R0
+end
+
+# Version 3 (required tab)
+set R0 10
+if R0 = 10:
+    out R0
+
+# Version 4 (optional tab)
+set R0 10
+if R0 = 10 {
+    out R0
+}
