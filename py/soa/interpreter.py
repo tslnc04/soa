@@ -16,6 +16,9 @@ def get_register_value(register_tree):
 
 def get_int_value(int_tree):
     "get_int_value uses a tree to find the integer value of the token"
+    if not int_tree["Tok"]:
+        return None
+
     int_token = int_tree["Tok"]
     int_value = int_token["Val"]
 
@@ -23,6 +26,9 @@ def get_int_value(int_tree):
 
 def get_tree_type(token_tree):
     "get_tree_type returns the token type of the token in a tree"
+    if not token_tree["Tok"]:
+        return None
+
     token_token = token_tree["Tok"]
     token_type = token_token["Typ"]
 
@@ -40,8 +46,7 @@ class Interpreter():
             return None
         
         return_tree = parent["Sub"][0]
-        del parent["Sub"]
-        print("tree", type(parent), str(parent).replace("'", '"').replace("...", "").replace("None", "null"))
+        del parent["Sub"][0]
 
         return return_tree
 
@@ -142,8 +147,8 @@ class Interpreter():
                     register_value = self.get_registry(get_register_value(if_tree["Sub"][i]))
                     to_compare.append(register_value)
 
-            if_tree = if_tree["Sub"][2:]
-            
+            del if_tree["Sub"][:2] 
+
             if to_compare[0] == to_compare[1]:
                 return self.interpret_main(if_tree)
 
@@ -166,9 +171,6 @@ class Interpreter():
             nonlocal parent
             while True:
                 subtree = self.get_next_subtree(parent)
-                print("\nTREE TYPE", parent is self.tree, token.TOKEN_NAMES[get_tree_type(subtree)] + "\n")
-                time.sleep(0.5)
-
                 if subtree is None:
                     return None
                 
