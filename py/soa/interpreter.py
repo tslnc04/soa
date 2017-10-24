@@ -38,7 +38,7 @@ class Interpreter():
     "Interpreter carries all of the methods related to the interpreter"
     def __init__(self, parse_tree):
         self.tree = parse_tree
-        self.registry = []
+        self.registry = [0]
 
     def get_next_subtree(self, parent):
         "get_next_subtree gets the next subtree for use in interpret_main"

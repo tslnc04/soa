@@ -91,13 +91,15 @@ def test_comment_lexing():
 
 def test_if_lexing():
     "Tests if the lexer properly lexes an if"
-    code = "if"
+    code = "if R0 0"
 
     output = soa.lexer.lex_soa(code)
 
     expected = [
         {"Pos": 2, "Typ": soa.token.IF, "Val": "if"},
-        {"Pos": 2, "Typ": soa.token.EOF, "Val": ""}
+        {"Pos": 5, "Typ": soa.token.REGISTER, "Val": "R0"},
+        {"Pos": 7, "Typ": soa.token.INT, "Val": "0"},
+        {"Pos": 7, "Typ": soa.token.EOF, "Val": ""}
     ]
 
     if output == expected:

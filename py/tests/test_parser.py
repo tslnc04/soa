@@ -54,9 +54,9 @@ def test_add_parsing():
 
     output = soa.parser.parse_soa(tokens)
 
-    if (output["Sub"][0]["Tok"] == tokens[0] and 
-            output["Sub"][0]["Sub"][0]["Tok"] == tokens[1] and 
-            output["Sub"][0]["Sub"][1]["Tok"] == tokens[2]):
+    if (output["Sub"][0]["Tok"] == tokens[0]
+            and output["Sub"][0]["Sub"][0]["Tok"] == tokens[1]
+            and output["Sub"][0]["Sub"][1]["Tok"] == tokens[2]):
         return True
 
     return False
@@ -71,6 +71,38 @@ def test_exit_parsing():
     output = soa.parser.parse_soa(tokens)
 
     if output["Sub"][0]["Tok"] == tokens[0]:
+        return True
+
+    return False
+
+def test_if_parsing():
+    "Tests if the parser properly parses an if"
+    tokens = [
+        {"Pos": 2, "Typ": soa.token.IF, "Val": "if"},
+        {"Pos": 5, "Typ": soa.token.REGISTER, "Val": "R0"},
+        {"Pos": 7, "Typ": soa.token.INT, "Val": "0"},
+        {"Pos": 7, "Typ": soa.token.EOF, "Val": ""}
+    ]
+
+    output = soa.parser.parse_soa(tokens)
+
+    if (output["Sub"][0]["Tok"] == tokens[0]
+            and output["Sub"][0]["Sub"][0]["Tok"] == tokens[1]
+            and output["Sub"][0]["Sub"][1]["Tok"] == tokens[2]):
+        return True
+
+    return False
+
+def test_fi_parsing():
+    "Tests if the parser properly parses a fi"
+    tokens = [
+        {"Pos": 2, "Typ": soa.token.FI, "Val": "fi"},
+        {"Pos": 2, "Typ": soa.token.EOF, "Val": ""}
+    ]
+
+    output = soa.parser.parse_soa(tokens)
+
+    if (output["Sub"][0]["Tok"] == tokens[0]):
         return True
 
     return False

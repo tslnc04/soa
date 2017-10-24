@@ -9,11 +9,9 @@ import soa.parser
 import soa.interpreter
 
 code = """
-set R0 72
-if R0 72
-add R0 -10
+if R0 0
+set R0 10
 fi
-out R0
 """
 
 if not code:
@@ -24,7 +22,8 @@ if not code:
 lexed = soa.lexer.lex_soa(code)
 
 print("\n----- LEXER -----\n")
-soa.token.print_tokens(lexed)
+print(str(lexed).replace("'", '"').replace("...", "").replace("None", "null"))
+# soa.token.print_tokens(lexed)
 print("\n----- PARSER -----\n")
 parsed = soa.parser.parse_soa(lexed)
 print(str(parsed).replace("'", '"').replace("...", "").replace("None", "null"))
