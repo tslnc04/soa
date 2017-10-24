@@ -178,7 +178,7 @@ class Lexer():
         self.forward(2)
         self.emit(token.IF)
 
-        return self.lex_main
+        return self.lex_values
 
     def lex_fi(self):
         "lex_fi produces a fi token"
